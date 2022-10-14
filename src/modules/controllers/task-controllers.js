@@ -1,87 +1,98 @@
-const Task = require('../../db/models/task')
+const Task = require('../../models/task')
 
-module.exports.getAllTask = async (req, res) => {
+const getAllTask = async (req, res) => {
   try {
     await Task.find().then(result => {
-      res.send({data: result});
+      res.status(200).send({data: result});
     });
   } catch (error) {
     res.status(400).json({message: 'Unknown error'});
   }
 };
 
-module.exports.createTask = async (req, res) => {
-  console.log(req);
+const createTask = async (req, res) => {
   try {
     if (req.body.text.trim() === '') {
-      return res.status(400).json({message: 'Invalid input'});
+      throw new Error();
     }
 
-    const {text} = req.body;
-    const task = new Task({text});
+    const { text } = req.body;
+    const task = new Task({ text });
     await task.save().then(result => {
-      res.send(result);
+      res.status(201).send(result);
     });
   } catch (error) {
-    console.log(error);
-    res.status(400).json(error.message);
+    res.status(400).json({message: 'Create failed'});
   }
-  
 };
 
-module.exports.changeTaskText = async (req, res) => {
+const changeTaskText = async (req, res) => {
   try {
     if (!req.params.hasOwnProperty('id')) {
-      return res.status(400).json({message: 'Invalid ID'});
+      throw new Error();
     }
 
     if (!req.body.hasOwnProperty('text') || req.body.text.trim() === '' ) {
-      return res.status(415).json({message: 'Invalid input'});
+      throw new Error();
     }
 
     const {id} = req.params;
     const newText = req.body;
-    await Task.findByIdAndUpdate(id, newText, {new: true}).then(result => {
-      res.send(result);
+    await Task.findByIdAndUpdate(
+      id, 
+      newText, 
+      {new: true}
+    ).then(result => {
+      res.status(200).send(result);
     });
   } catch (error) {
-    res.status(400).json(error.message);
+    res.status(400).json({message: 'Error'});
   }
-
 };
 
-module.exports.changeTaskIsCheck = async (req, res) => {
+const changeTaskIsCheck = async (req, res) => {
   try {
-    if (!req.params.id) {
-      return res.status(400).json({message: 'Invalid ID'});
+    if (!req.params.hasOwnProperty("_id")) {
+      throw new Error();
     }
 
     if (!req.body.hasOwnProperty('isCheck') || typeof(req.body.isCheck) !== 'boolean') {
-      return res.status(415).json({message: 'error'})
+      throw new Error();
     }
     
     const check = req.body.isCheck;
-    const {id} = req.params;
-    await Task.findByIdAndUpdate(id, {isCheck: check}, {new: true}).then(result => {
-      res.send(result);
+    const { id } = req.params;
+    await Task.findByIdAndUpdate(
+      id, 
+      {isCheck: check}, 
+      {new: true}
+      ).then(result => {
+      res.status(200).send(result);
     });
   } catch (error) {
-    res.status(404).json(error.message);
+    res.status(400).json({message: 'Error change'});
   }
-
 };
 
-module.exports.deleteTask = async (req, res) => {
+const deleteTask = async (req, res) => {
   try {    
     if (!req.params.hasOwnProperty('id')) {
-      return res.status(400).json({message: 'Invalid ID'});
+      throw new Error();
     }
     
     const {id} = req.params;
     await Task.findByIdAndDelete(id).then(result => {
-      res.status(200).json({message: 'Good'});
+      res.status(200).json({data}); // in process
     });
   } catch (error) {
-    res.status(400).json(error.message);
+    res.status(400).json({message: 'Error delete'});
   }    
 }
+
+module.exports = {
+  getAllTask,
+  createTask,
+  changeTaskText,
+  changeTaskIsCheck,
+  deleteTask
+};
