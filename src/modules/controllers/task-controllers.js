@@ -82,10 +82,21 @@ const deleteTask = async (req, res) => {
   }    
 }
 
+const deleteAll = async (req, res) => {
+  try {
+    await Task.deleteMany().then(result => {
+      res.status(200).send(result);
+    });
+  } catch (error) {
+    res.status(400).send({ message: 'Error delete tasks' });
+  }
+}
+
 module.exports = {
   getAllTask,
   createTask,
   changeTaskText,
   changeTaskIsCheck,
-  deleteTask
+  deleteTask,
+  deleteAll,
 };
