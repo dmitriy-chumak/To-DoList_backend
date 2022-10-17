@@ -1,9 +1,9 @@
 const Task = require('../../models/task')
 const { validationText, validationIsCheck } = require('../../helpers/validator')
 
-const getAllTask = async (req, res) => {
+const getAllTask = (req, res) => {
   try {
-    await Task.find().then(result => {
+      Task.find().sort({'isCheck': 1}).then(result => {
       res.status(200).send({ data: result });
     });
   } catch (error) {
@@ -11,7 +11,7 @@ const getAllTask = async (req, res) => {
   }
 };
 
-const createTask = async (req, res) => {
+const createTask = (req, res) => {
   try {
     if (validationText(req.body.text)) {
       throw new Error();
@@ -19,7 +19,7 @@ const createTask = async (req, res) => {
 
     const { text } = req.body;
     const task = new Task({ text });
-    await task.save().then(result => {
+    task.save().then(result => {
       res.status(201).send(result);
     });
   } catch (error) {
@@ -27,7 +27,7 @@ const createTask = async (req, res) => {
   }
 };
 
-const changeTaskText = async (req, res) => {
+const changeTaskText = (req, res) => {
   try {
     if (!req.body.hasOwnProperty('text') || validationText(req.body.text)) {
       throw new Error();
@@ -35,7 +35,7 @@ const changeTaskText = async (req, res) => {
 
     const { id } = req.params;
     const newText = req.body;
-    await Task.findByIdAndUpdate(
+    Task.findByIdAndUpdate(
       id, 
       newText, 
       { new: true }
@@ -47,7 +47,7 @@ const changeTaskText = async (req, res) => {
   }
 };
 
-const changeTaskIsCheck = async (req, res) => {
+const changeTaskIsCheck = (req, res) => {
   try {
     if (!req.body.hasOwnProperty('isCheck') || !validationIsCheck(req.body.isCheck)) {
       throw new Error();
@@ -55,7 +55,7 @@ const changeTaskIsCheck = async (req, res) => {
 
     const check = req.body.isCheck;
     const { id } = req.params;
-    await Task.findByIdAndUpdate(
+    Task.findByIdAndUpdate(
       id, 
       { isCheck: check }, 
       { new: true }
@@ -67,10 +67,10 @@ const changeTaskIsCheck = async (req, res) => {
   }
 };
 
-const deleteTask = async (req, res) => {
+const deleteTask = (req, res) => {
   try {     
     const { id } = req.params;
-    await Task.deleteOne({ _id: id }).then(result => {
+    Task.deleteOne({ _id: id }).then(result => {
       res.status(200).send(result);
     });
   } catch (error) {
@@ -78,9 +78,9 @@ const deleteTask = async (req, res) => {
   }    
 }
 
-const deleteAll = async (req, res) => {
+const deleteAll = (req, res) => {
   try {
-    await Task.deleteMany().then(result => {
+    Task.deleteMany().then(result => {
       res.status(200).send(result);
     });
   } catch (error) {
