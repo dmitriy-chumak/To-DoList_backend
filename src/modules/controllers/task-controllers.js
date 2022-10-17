@@ -7,7 +7,7 @@ const getAllTask = async (req, res) => {
       res.status(200).send({ data: result });
     });
   } catch (error) {
-    res.status(400).json({message: 'Unknown error'});
+    res.status(400).send({message: 'Failed to get tasks'});
   }
 };
 
@@ -29,7 +29,7 @@ const createTask = async (req, res) => {
 
 const changeTaskText = async (req, res) => {
   try {
-    if (!req.params.hasOwnProperty('id') || !req.body.hasOwnProperty('text') || validationText(req.body.text)) {
+    if (!req.body.hasOwnProperty('text') || validationText(req.body.text)) {
       throw new Error();
     }
 
@@ -49,16 +49,16 @@ const changeTaskText = async (req, res) => {
 
 const changeTaskIsCheck = async (req, res) => {
   try {
-    if (!req.params.hasOwnProperty('id') || !req.body.hasOwnProperty('isCheck') || validationIsCheck(req.body.isCheck)) {
+    if (!req.body.hasOwnProperty('isCheck') || !validationIsCheck(req.body.isCheck)) {
       throw new Error();
     }
 
     const check = req.body.isCheck;
     const { id } = req.params;
     await Task.findByIdAndUpdate(
-    id, 
-    { isCheck: check }, 
-    { new: true }
+      id, 
+      { isCheck: check }, 
+      { new: true }
     ).then(result => {
       res.status(200).send(result);
     });
@@ -68,11 +68,7 @@ const changeTaskIsCheck = async (req, res) => {
 };
 
 const deleteTask = async (req, res) => {
-  try {    
-    if (!req.params.hasOwnProperty('id')) {
-      throw new Error();
-    }
-    
+  try {     
     const { id } = req.params;
     await Task.deleteOne({ _id: id }).then(result => {
       res.status(200).send(result);
