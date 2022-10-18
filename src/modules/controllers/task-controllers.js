@@ -3,7 +3,7 @@ const { validationText, validationIsCheck } = require('../../helpers/validator')
 
 const getAllTask = (req, res) => {
   try {
-      Task.find().sort({'isCheck': 1}).then(result => {
+    Task.find().sort({'isCheck': 1}).then(result => {
       res.status(200).send({ data: result });
     });
   } catch (error) {
